@@ -19,10 +19,6 @@ if [[ ! $ZSH_PLUGIN_STATIC -nt $ZSH_PLUGIN_LIST ]]; then
   antidote bundle <"$ZSH_PLUGIN_LIST" >! "$ZSH_PLUGIN_STATIC"
 fi
 
-# --- Zsh completions/init: Must come before plugins!
-autoload -Uz compinit
-compinit
-
 # 3. Source the fast loaded plugin file (all plugins loaded from cache)
 source "$ZSH_PLUGIN_STATIC"
 
@@ -32,6 +28,10 @@ source "$HOME/.config/zsh/aliases.zsh"
 source "$HOME/.config/zsh/functions.zsh"
 source "$HOME/.config/zsh/theme.zsh"
 source "$HOME/.config/zsh/completions.zsh"
+
+if [[ $USER == 'erenc']];then
+  source "$HOME/.config/zsh/proxy.zsh"
+fi
 
 # Inline docs in every module per original structure
 

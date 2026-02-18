@@ -18,13 +18,6 @@ fi
 
 # Add user-local bin to PATH (standard best practice for modern CLI setup)
 export PATH="$HOME/.local/bin:$PATH"
-
-# Example: NVM (Node) environment, only loads if directory exists
-NVM_DIR="$HOME/.nvm"
-if [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
-  export NVM_DIR
-  . "/opt/homebrew/opt/nvm/nvm.sh"
-fi
 # Go, Kotlin, and Java typically do not need env setup here unless you want to set GOPATH, JAVA_HOME, etc.
 
 # --------------------------
@@ -32,9 +25,3 @@ fi
 # --------------------------
 # Only loaded if the relevant binary is present for max efficiency.
 
-# Go completions (requires Go 1.11+)
-if command -v go &>/dev/null; then
-  source <(go completion zsh)
-fi
-# Add Java, Kotlin, or other completions here if needed in future
-# Most CLI tools are covered via the zsh-completions plugin or provide built-in completions.
