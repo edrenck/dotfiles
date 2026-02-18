@@ -29,7 +29,7 @@ source "$HOME/.config/zsh/functions.zsh"
 source "$HOME/.config/zsh/theme.zsh"
 source "$HOME/.config/zsh/completions.zsh"
 
-if [[ $USER == 'erenc']];then
+if [[ "$USER" = "erenc" ]]; then
   source "$HOME/.config/zsh/proxy.zsh"
 fi
 
