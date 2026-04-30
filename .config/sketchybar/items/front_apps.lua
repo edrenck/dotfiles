@@ -30,8 +30,8 @@ local function updateWindows(windows)
   local foundWindows = string.gmatch(windows, "[^\n]+")
   for window in foundWindows do
     local parsedWindow = {}
-    for key, value in string.gmatch(window, "(%w+)=([%w%s]+)") do
-      parsedWindow[key] = value
+    for key, value in string.gmatch(window, "(%w+)=([^,]+)") do
+      parsedWindow[key] = value:gsub("^%s+", ""):gsub("%s+$", "")
     end
 
     local windowId = parsedWindow["id"]

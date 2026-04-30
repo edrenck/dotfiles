@@ -1,10 +1,11 @@
 theme = "Catppuccin Macchiato"
 macos-titlebar-style = transparent
 background-blur=true
-background-opacity=0.9
+background-opacity = 1.00
 font-family = "Osaka-Mono"
 font-size = 20
 
 quick-terminal-position = center
 quick-terminal-animation-duration = 0
 keybind = global:cmd+escape=toggle_quick_terminal
+shell-integration-features = true

@@ -4,6 +4,7 @@ local events <const> = {
   SWAP_MENU_AND_SPACES = "swap_menu_and_spaces",
   FRONT_APP_SWITCHED = "front_app_switched",
   UPDATE_WINDOWS = "update_windows",
+  SPACE_WINDOWS_CHANGE = "space_windows_change",
   SEND_MESSAGE = "send_message",
   HIDE_MESSAGE = "hide_message",
 }
@@ -25,6 +26,7 @@ local aerospace <const> = {
   LIST_ALL_WORKSPACES = "aerospace list-workspaces --all",
   GET_CURRENT_WORKSPACE = "aerospace list-workspaces --focused",
   LIST_WINDOWS = "aerospace list-windows --workspace focused --format \"id=%{window-id}, name=%{app-name}\"",
+  LIST_ALL_WINDOWS = "aerospace list-windows --all --format '%{workspace}|%{app-name}|%{window-id}'",
   GET_CURRENT_WINDOW = "aerospace list-windows --focused --format %{app-name}",
 }
 

@@ -13,6 +13,7 @@ sbar.add("event", constants.events.AEROSPACE_WORKSPACE_CHANGED)
 sbar.add("event", constants.events.UPDATE_WINDOWS)
 sbar.add("event", constants.events.FRONT_APP_SWITCHED)
 sbar.add("event", constants.events.SWAP_MENU_AND_SPACES)
+sbar.add("event", constants.events.SPACE_WINDOWS_CHANGE)
 
 require("bar")
 require("default")
