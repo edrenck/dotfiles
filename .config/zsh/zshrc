@@ -1,46 +1,50 @@
-# ~/.config/zsh/zshrc — Main Zsh configuration loader (REVISED)
-# Modular: Optimized for Antidote as a function-only plugin manager.
-# This version guarantees static plugin loading and autoloads Antidote functions per best practices.
-eval "$(/opt/homebrew/bin/brew shellenv)"
-# 0. Zsh completions/init: Must come before plugins or plugin manager!
-autoload -Uz compinit
-compinit
+HISTFILE=~/.history
+HISTSIZE=10000
+SAVEHIST=10000
 
-# 1. Make Antidote functions available for 'bundle', 'update', etc. (ALWAYS BEFORE first use)
-fpath=("/opt/homebrew/opt/antidote/share/antidote/functions" $fpath)
-autoload -Uz antidote
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
 
-# 1. Define plugin bundle and static loader path
-ZSH_PLUGIN_LIST="$HOME/.config/zsh/plugins.zsh"
-ZSH_PLUGIN_STATIC="$HOME/.zsh_plugins.zsh"
+# ---------- Editor ----------
+# Default editor used by git, crontab, etc.
+export EDITOR="nvim"
+export VISUAL="nvim"
 
-# 2. Rebuild plugin static loader if the list has changed (super-fast, idempotent)
-if [[ ! $ZSH_PLUGIN_STATIC -nt $ZSH_PLUGIN_LIST ]]; then
-  antidote bundle <"$ZSH_PLUGIN_LIST" >! "$ZSH_PLUGIN_STATIC"
+# ---------- Pager ----------
+if command -v bat >/dev/null 2>&1; then
+  export MANPAGER="bat -l man -p"
+elif command -v batcat >/dev/null 2>&1; then
+  export MANPAGER="batcat -l man -p"
 fi
 
-# 3. Source the fast loaded plugin file (all plugins loaded from cache)
-source "$ZSH_PLUGIN_STATIC"
+# ---------- GPG ----------
+export GPG_TTY=$(tty)
 
-# 4. Remaining modular configs (safe to load in any order after plugins)
-source "$HOME/.config/zsh/env.zsh"
-source "$HOME/.config/zsh/aliases.zsh"
-source "$HOME/.config/zsh/functions.zsh"
-source "$HOME/.config/zsh/theme.zsh"
-source "$HOME/.config/zsh/completions.zsh"
 
-if [[ "$USER" = "erenc" ]]; then
-  source "$HOME/.config/zsh/proxy.zsh"
+autoload -U compinit && compinit
+
+# Add Homebrew to PATH if installed (Apple Silicon first, then Intel fallback)
+if [ -d /opt/homebrew/bin ]; then
+  export PATH="/opt/homebrew/bin:$PATH"
+elif [ -d /usr/local/bin ]; then
+  export PATH="/usr/local/bin:$PATH"
 fi
 
-# Inline docs in every module per original structure
+# Add user-local bin to PATH (standard best practice for modern CLI setup)
+export PATH="$HOME/.local/bin:$PATH"
 
-# Ensure zoxide hooks completions to all relevant aliases (cd/z/j) AFTER all aliases/plugins have loaded
-if command -v zoxide &>/dev/null; then
-  eval "$(zoxide init zsh)"
-fi
 
-# Manually load fzf-tab after ALL plugins and everything else (per robust integration)
-if [ -f "$HOME/.cache/antidote/https-COLON--SLASH--SLASH-github.com-SLASH-Aloxaf-SLASH-fzf-tab/fzf-tab.plugin.zsh" ]; then
-  source "$HOME/.cache/antidote/https-COLON--SLASH--SLASH-github.com-SLASH-Aloxaf-SLASH-fzf-tab/fzf-tab.plugin.zsh"
-fi
+# Lazy-load antidote from its functions directory.
+source $(brew --prefix)/opt/antidote/share/antidote/antidote.zsh
+
+antidote load
+
+source $HOME/.config/zsh/aliases.zsh
+source $HOME/.config/zsh/fzf.zsh
+source $HOME/.config/zsh/options.zsh
+
+eval "$(starship init zsh)"
+eval "$(zoxide init zsh)"
+

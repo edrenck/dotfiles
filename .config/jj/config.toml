@@ -1,9 +1,0 @@
-[user]
-name = "Edwin Renck"
-email = "edrenck@gmail.com"
-
-[ui]
-default-command = "log"
-
-[template-aliases]
-"format_short_signature(signature)" = "signature.name()"
