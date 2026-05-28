@@ -1,0 +1,12 @@
+#!/bin/bash
+
+options=(
+  style=round
+  width=6.0
+  hidpi=on
+  active_color=0xFFFF8F40
+  inactive_color=0xFF5C6773
+  blacklist='System Settings,Login Window,Notification Center,Control Center'
+)
+
+borders "${options[@]}"

@@ -7,11 +7,6 @@
 after-login-command = []
 
 
-after-startup-command = [
-     'exec-and-forget /opt/homebrew/opt/borders/bin/borders active_color=0xff89b4f inactive_color=0xFF45475a width=5.0',
-     'exec-and-forget /opt/homebrew/opt/sketchybar/bin/sketchybar'
-]
-
 # Start AeroSpace at login
 start-at-login = true
 
@@ -63,12 +58,12 @@ preset = 'qwerty'
 #                 Monitor pattern is the same as for 'workspace-to-monitor-force-assignment'.
 #                 See: https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitors
 [gaps]
-inner.horizontal = 8
-inner.vertical =   8
-outer.left =       8
-outer.bottom =     8
-outer.top =        [{monitor.1 = 8}, {monitor.2 = 36}, 2]
-outer.right =      8
+inner.horizontal = 16
+inner.vertical =   16
+outer.left =       16
+outer.bottom =     16
+outer.top =        16
+outer.right =      16
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
