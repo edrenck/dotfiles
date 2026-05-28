@@ -1,23 +1,20 @@
-require("install.sbar")
+os.execute("[ ! -d $HOME/.local/share/sketchybar_lua/ ] && (git clone https://github.com/FelixKratz/SbarLua.git /tmp/SbarLua && cd /tmp/SbarLua/ && make install && rm -rf /tmp/SbarLua/)")
 
-sbar = require("sketchybar")
+os.execute("[ ! -d $HOME/.local/share/rift.lua/ ] && (git clone https://github.com/acsandmann/rift.lua.git /tmp/rift.lua && cd /tmp/rift.lua/ && make install && rm -rf /tmp/rift.lua/)")
 
-sbar.begin_config()
-sbar.hotload(true)
+local HOME = os.getenv("HOME")
+package.cpath = package.cpath
+    .. ";" .. HOME .. "/.local/share/sketchybar_lua/?.so"
+    .. ";" .. HOME .. "/.local/share/rift.lua/?.so"
 
-local constants = require("constants")
-require("config")
+---@type SbarModule
+Sbar = require("sketchybar")
 
--- Register custom events
-sbar.add("event", constants.events.AEROSPACE_WORKSPACE_CHANGED)
-sbar.add("event", constants.events.UPDATE_WINDOWS)
-sbar.add("event", constants.events.FRONT_APP_SWITCHED)
-sbar.add("event", constants.events.SWAP_MENU_AND_SPACES)
-sbar.add("event", constants.events.SPACE_WINDOWS_CHANGE)
-
+Sbar.begin_config()
+Sbar.hotload(true)
+require("helpers.utils")
 require("bar")
 require("default")
 require("items")
-
-sbar.end_config()
-sbar.event_loop()
+Sbar.end_config()
+Sbar.event_loop()

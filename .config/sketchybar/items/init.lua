@@ -1,11 +1,16 @@
--- Left items
-require("items.menu_spaces_toggle")
-require("items.menus")
-require("items.spaces")
-require("items.front_apps")
+local settings = require("settings")
 
--- Right items
-require("items.message")
-require("items.widgets")
-
--- require("items.media")
+-- require("items.menus")
+if settings.wm == "yabai" then
+    require("items.spaces_yabai")
+elseif settings.wm == "aerospace" then
+    require("items.spaces_aerospace")
+elseif settings.wm == "rift" then
+    require("items.spaces_rift")
+end
+require("items.calendar")
+require("items.battery")
+require("items.wifi")
+require("items.cpu")
+require("items.media")
+-- require("items.volume")
