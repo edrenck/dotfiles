@@ -90,15 +90,3 @@ Authentication stores, Anytype API keys, editor prompt databases, histories,
 logs, and environment files must remain local. Store shell secrets in
 `~/.zshrc.local` or use a password manager. An ignore rule does not untrack files
 already committed, remove old history, or revoke a leaked credential.
-
-## Past credential exposure
-
-The published history contained GitHub token strings in the Copilot SQLite WAL
-and a nonempty Anytype API-key file. Their validity was not tested.
-The affected credentials have been rotated. Authentication and prompt database
-files are excluded from the tracked tree. History cleanup is part of this
-security update; old clones and cached views may still retain copies.
-
-Follow [GitHub's sensitive-data removal guide](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository).
-A history rewrite requires coordinating existing clones and force-pushing;
-it cannot remove copies downloaded by others.
