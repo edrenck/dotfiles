@@ -30,7 +30,7 @@ default-root-container-orientation = 'auto'
 exec-on-workspace-change = [
   '/bin/bash',
   '-c',
-  '/opt/homebrew/bin/sketchybar --trigger aerospace_workspace_changed FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
+  '/usr/bin/pkill -USR1 -x ConstellationBar 2>/dev/null || true'
 ]
 
 # Mouse follows focus when focused monitor changes
@@ -121,21 +121,13 @@ alt-2 = 'workspace 2'
 alt-3 = 'workspace 3'
 alt-4 = 'workspace 4'
 alt-5 = 'workspace 5'
-alt-6 = 'workspace 6'
-alt-7 = 'workspace 7'
-alt-8 = 'workspace 8'
-alt-9 = 'workspace 9'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
-alt-shift-1 = ['move-node-to-workspace --focus-follows-window 1', 'exec-and-forget /opt/homebrew/bin/sketchybar --trigger space_windows_change']
-alt-shift-2 = ['move-node-to-workspace --focus-follows-window 2', 'exec-and-forget /opt/homebrew/bin/sketchybar --trigger space_windows_change']
-alt-shift-3 = ['move-node-to-workspace --focus-follows-window 3', 'exec-and-forget /opt/homebrew/bin/sketchybar --trigger space_windows_change']
-alt-shift-4 = ['move-node-to-workspace --focus-follows-window 4', 'exec-and-forget /opt/homebrew/bin/sketchybar --trigger space_windows_change']
-alt-shift-5 = ['move-node-to-workspace --focus-follows-window 5', 'exec-and-forget /opt/homebrew/bin/sketchybar --trigger space_windows_change']
-alt-shift-6 = ['move-node-to-workspace --focus-follows-window 6', 'exec-and-forget /opt/homebrew/bin/sketchybar --trigger space_windows_change']
-alt-shift-7 = ['move-node-to-workspace --focus-follows-window 7', 'exec-and-forget /opt/homebrew/bin/sketchybar --trigger space_windows_change']
-alt-shift-8 = ['move-node-to-workspace --focus-follows-window 8', 'exec-and-forget /opt/homebrew/bin/sketchybar --trigger space_windows_change']
-alt-shift-9 = ['move-node-to-workspace --focus-follows-window 9', 'exec-and-forget /opt/homebrew/bin/sketchybar --trigger space_windows_change']
+alt-shift-1 = ['move-node-to-workspace --focus-follows-window 1', 'exec-and-forget /bin/bash -c "/usr/bin/pkill -USR1 -x ConstellationBar 2>/dev/null || true"']
+alt-shift-2 = ['move-node-to-workspace --focus-follows-window 2', 'exec-and-forget /bin/bash -c "/usr/bin/pkill -USR1 -x ConstellationBar 2>/dev/null || true"']
+alt-shift-3 = ['move-node-to-workspace --focus-follows-window 3', 'exec-and-forget /bin/bash -c "/usr/bin/pkill -USR1 -x ConstellationBar 2>/dev/null || true"']
+alt-shift-4 = ['move-node-to-workspace --focus-follows-window 4', 'exec-and-forget /bin/bash -c "/usr/bin/pkill -USR1 -x ConstellationBar 2>/dev/null || true"']
+alt-shift-5 = ['move-node-to-workspace --focus-follows-window 5', 'exec-and-forget /bin/bash -c "/usr/bin/pkill -USR1 -x ConstellationBar 2>/dev/null || true"']
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
 alt-tab = 'workspace-back-and-forth'
@@ -158,7 +150,7 @@ alt-shift-t = 'layout tiling'
   esc = 'mode main'
 
 [[on-window-detected]]
-  run = ['exec-and-forget /opt/homebrew/bin/sketchybar --trigger space_windows_change']
+  run = ['exec-and-forget /bin/bash -c "/usr/bin/pkill -USR1 -x ConstellationBar 2>/dev/null || true"']
 
 [[on-window-detected]]
   if.app-id = 'com.apple.finder'

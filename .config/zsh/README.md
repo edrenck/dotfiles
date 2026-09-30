@@ -1,12 +1,11 @@
-## Run the following command to install all dependencies
+# Zsh setup
 
-```
-brew install zsh neovim eza bat fd fzf zoxide starship ripgrep antidote thefuck
-```
+`~/.zshrc` sources `~/.config/zsh/zshrc`, which explicitly loads `.zshenv`
+from this directory. Leave `ZDOTDIR` unset for this layout.
 
-## Create required directories
+See the repository README for the Homebrew dependency command. Missing optional
+tools leave the standard shell commands available. Plugin and completion caches
+are generated locally; do not track them. History remains in `~/.history`.
 
-```
-mkdir -p ~/.local/state/zsh   # history
-mkdir -p ~/.cache/zsh         # completion cache
-```
+The prompt reads `~/.config/starship.toml`. Per-machine overrides and credentials
+belong in the ignored `~/.zshrc.local`, sourced after the shared configuration.

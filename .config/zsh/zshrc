@@ -1,50 +1,51 @@
-HISTFILE=~/.history
+source "$HOME/.config/zsh/.zshenv"
+
+# Preserve the existing history location.
+HISTFILE="$HOME/.history"
 HISTSIZE=10000
 SAVEHIST=10000
 
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_CACHE_HOME="$HOME/.cache"
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_STATE_HOME="$HOME/.local/state"
+# Zsh's unique path array avoids duplicate entries on repeated sourcing.
+typeset -U path PATH
+if [[ -d /opt/homebrew/bin ]]; then
+  path=(/opt/homebrew/bin $path)
+elif [[ -d /usr/local/bin ]]; then
+  path=(/usr/local/bin $path)
+fi
+path=("$HOME/.local/bin" $path)
 
-# ---------- Editor ----------
-# Default editor used by git, crontab, etc.
-export EDITOR="nvim"
-export VISUAL="nvim"
-
-# ---------- Pager ----------
 if command -v bat >/dev/null 2>&1; then
   export MANPAGER="bat -l man -p"
 elif command -v batcat >/dev/null 2>&1; then
   export MANPAGER="batcat -l man -p"
 fi
+[[ -t 0 ]] && export GPG_TTY="$(tty)"
 
-# ---------- GPG ----------
-export GPG_TTY=$(tty)
+autoload -Uz compinit
+compinit
 
-
-autoload -U compinit && compinit
-
-# Add Homebrew to PATH if installed (Apple Silicon first, then Intel fallback)
-if [ -d /opt/homebrew/bin ]; then
-  export PATH="/opt/homebrew/bin:$PATH"
-elif [ -d /usr/local/bin ]; then
-  export PATH="/usr/local/bin:$PATH"
+# A fresh machine can still start a usable shell before plugins are installed.
+if command -v brew >/dev/null 2>&1; then
+  antidote_file="$(brew --prefix)/opt/antidote/share/antidote/antidote.zsh"
+  if [[ -r "$antidote_file" ]]; then
+    source "$antidote_file"
+    antidote load
+  fi
+  unset antidote_file
 fi
 
-# Add user-local bin to PATH (standard best practice for modern CLI setup)
-export PATH="$HOME/.local/bin:$PATH"
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+fi
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+fi
+if command -v thefuck >/dev/null 2>&1; then
+  eval "$(thefuck --alias)"
+fi
 
-
-# Lazy-load antidote from its functions directory.
-source $(brew --prefix)/opt/antidote/share/antidote/antidote.zsh
-
-antidote load
-
-source $HOME/.config/zsh/aliases.zsh
-source $HOME/.config/zsh/fzf.zsh
-source $HOME/.config/zsh/options.zsh
-
-eval "$(starship init zsh)"
-eval "$(zoxide init zsh)"
-eval $(thefuck --alias)
+source "$HOME/.config/zsh/aliases.zsh"
+source "$HOME/.config/zsh/options.zsh"
+if command -v fzf >/dev/null 2>&1 && command -v fd >/dev/null 2>&1; then
+  source "$HOME/.config/zsh/fzf.zsh"
+fi

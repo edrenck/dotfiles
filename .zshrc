@@ -1,4 +1,8 @@
-# ~/.zshrc — Minimal bootstrapper for modular Zsh
-# All Zsh configuration is managed in $HOME/.config/zsh/zshrc for clarity and maintainability.
-# This file simply sources the main modular entry point.
-source "$HOME/.config/zsh/zshrc"
+# Interactive Zsh bootstrap; shared configuration lives under .config/zsh.
+if [[ -r "$HOME/.config/zsh/zshrc" ]]; then
+  source "$HOME/.config/zsh/zshrc"
+fi
+# Per-machine settings and secrets belong in this ignored file.
+if [[ -r "$HOME/.zshrc.local" ]]; then
+  source "$HOME/.zshrc.local"
+fi

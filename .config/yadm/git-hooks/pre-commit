@@ -1,0 +1,28 @@
+#!/bin/sh
+set -eu
+root=$(git rev-parse --show-toplevel)
+cd "$root"
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "Commit blocked: install gitleaks (macOS: brew install gitleaks)." >&2
+  exit 1
+fi
+# Reject credential/state files even when no token pattern matches their content.
+blocked=$(git ls-files -- '.config/anytype/*' '.config/github-copilot/*' \
+  '.config/zed/prompts/*' '.ssh/*' '.aws/*' '.gnupg/*' \
+  '*.db' '*.db-*' '*.sqlite' '*.sqlite-*' '*.sqlite3' '*.sqlite3-*' '*.mdb' \
+  '*.pem' '*.key' '*.p12' '*.pfx' 'api-key' 'api_key' \
+  'auth.json' 'auth.yaml' 'auth.yml' 'credentials.json' '.env' '.env.*' \
+  '.zshrc.local' '*.local.zsh' '*history*' '.netrc' '.npmrc' '.pypirc' \
+  '.git-credentials' '.envrc' '.envrc.*' 'credentials.*' 'secrets.*' \
+  '*.secret' '*.secrets' 'id_rsa' 'id_ed25519' 'id_ecdsa' 'id_dsa' \
+  ':!.env.example' ':!.envrc.example')
+if [ -n "$blocked" ]; then
+  echo "Commit blocked: credential or application-state files are tracked:" >&2
+  printf '%s\n' "$blocked" >&2
+  exit 1
+fi
+# Text diffs skip binary database contents. Scan an exact snapshot of the index.
+snapshot=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-index.XXXXXX")
+trap 'rm -rf "$snapshot"' EXIT HUP INT TERM
+git checkout-index --all --prefix="$snapshot/"
+gitleaks dir --redact=100 --no-banner "$snapshot"

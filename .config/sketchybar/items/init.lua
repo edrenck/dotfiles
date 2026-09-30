@@ -11,6 +11,7 @@ end
 require("items.calendar")
 require("items.battery")
 require("items.wifi")
+require("items.vpn")
 require("items.cpu")
 require("items.media")
 -- require("items.volume")

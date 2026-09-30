@@ -1,52 +1,27 @@
-# Better ls
-alias ls='eza --icons'
-
-# Detailed listing
-alias ll='eza -lh --icons --git'
-
-# Detailed listing including hidden files
-alias la='eza -lah --icons --git'
-
-# Tree view
-alias tree='eza --tree --icons'
-
-alias g='lazygit'
-
-alias d='lazydocker'
-
-# Reuse ls completions for eza (avoids defining a separate completion function)
-compdef eza=ls
-
-# Better cat
-alias cat='bat'
-
-# =========================================================
-# Core utilities
-# =========================================================
-
-alias grep='rg --color=auto'
-alias diff='diff --color=auto'
+# Optional tools should not remove the standard commands on a fresh machine.
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza --icons'
+  alias ll='eza -lh --icons --git'
+  alias la='eza -lah --icons --git'
+  alias tree='eza --tree --icons'
+  compdef eza=ls
+fi
+command -v lazygit >/dev/null 2>&1 && alias g='lazygit'
+command -v lazydocker >/dev/null 2>&1 && alias d='lazydocker'
+command -v zoxide >/dev/null 2>&1 && alias cd='z'
+command -v bat >/dev/null 2>&1 && alias cat='bat'
+command -v rg >/dev/null 2>&1 && alias grep='rg --color=auto'
 alias df='df -h'
+alias -- -='cd -'
+command -v nvim >/dev/null 2>&1 && alias vim='nvim'
 
-# =========================================================
-# Navigation
-# =========================================================
-
-alias -- -='cd -'  # -- prevents - being parsed as a flag; cd - jumps to previous directory
-
-lf() { # zsh follow lf navigation
-    tmp=$(mktemp)
-    command lf -last-dir-path="$tmp" "$@"
-    if [ -f "$tmp" ]; then
-        dir=$(cat "$tmp")
-        rm -f "$tmp"
-        [ -d "$dir" ] && [ "$dir" != "$(pwd)" ] && cd "$dir"
-    fi
+lf() {
+  local tmp dir
+  tmp=$(mktemp) || return
+  command lf -last-dir-path="$tmp" "$@"
+  if [[ -f "$tmp" ]]; then
+    dir=$(command cat "$tmp")
+    command rm -f "$tmp"
+    [[ -d "$dir" && "$dir" != "$PWD" ]] && builtin cd -- "$dir"
+  fi
 }
-
-# =========================================================
-# Editor
-# =========================================================
-
-alias vim='nvim'
-

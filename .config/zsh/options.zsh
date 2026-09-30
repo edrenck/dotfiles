@@ -9,7 +9,9 @@ setopt share_history
 unsetopt beep
 
 function chpwd_autols() {
-  eza --icons
+  if command -v eza >/dev/null 2>&1; then
+    eza --icons
+  fi
 }
 
 # Register with Zsh's chpwd hooks

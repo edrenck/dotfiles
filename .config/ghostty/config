@@ -1,7 +1,7 @@
 theme = "ayu"
 macos-titlebar-style = transparent
 background-blur=true
-background-opacity = 0.95
+background-opacity = 1.00
 font-family = "Osaka-Mono"
 font-size = 16
 
