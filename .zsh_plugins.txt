@@ -1,4 +1,7 @@
+# Completion definitions must be registered before compinit.
+zsh-users/zsh-completions path:src kind:fpath post:dotfiles_compinit
+
+# Initialize vi-mode before other plugins wrap the line-editor widgets.
+jeffreytse/zsh-vi-mode post:dotfiles_history_init
 zsh-users/zsh-autosuggestions
 zdharma-continuum/fast-syntax-highlighting
-zsh-users/zsh-history-substring-search
-jeffreytse/zsh-vi-mode

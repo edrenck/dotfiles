@@ -1,4 +1,4 @@
-setopt inc_append_history
+# SHARE_HISTORY already saves and imports entries across sessions.
 setopt auto_cd
 setopt auto_param_slash
 
