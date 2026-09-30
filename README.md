@@ -1,6 +1,6 @@
 # Personal dotfiles (yadm)
 
-Configuration for Zsh, Neovim, Ghostty, AeroSpace, SketchyBar, and related tools.
+Configuration for Zsh, Neovim, Ghostty, AeroSpace, and related tools.
 This repository uses your home directory as its work tree.
 
 ## Setup
@@ -28,11 +28,8 @@ Gitleaks and blocks commits if the scanner is missing. Review its redacted outpu
 - `.config/starship.toml`: prompt configuration.
 - `.zsh_plugins.txt`: Antidote plugin list.
 - `.config/nvim/`: LazyVim configuration and plugin locks.
-- `.aerospace.toml` and `.config/sketchybar/`: window and menu-bar configuration.
+- `.aerospace.toml`: window-manager configuration.
 
-SketchyBar additionally requires SketchyBar, Lua, its native helper modules,
-and the configured fonts. Its existing initialization downloads/builds SbarLua
-and rift.lua when missing; review that setup before running it on a new machine.
 This is currently a macOS-focused setup, not a cross-platform bootstrap.
 
 ## Keep private data local
