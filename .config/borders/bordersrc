@@ -4,8 +4,9 @@ options=(
   style=round
   width=6.0
   hidpi=on
-  active_color=0xFFFF8F40
-  inactive_color=0xFF5C6773
+  # Rose Pine: Foam (blue) to Iris (purple), dimmed when unfocused.
+  active_color='gradient(top_left=0xff9ccfd8,bottom_right=0xffc4a7e7)'
+  inactive_color='gradient(top_left=0x559ccfd8,bottom_right=0x55c4a7e7)'
   blacklist='System Settings,Login Window,Notification Center,Control Center'
 )
 
