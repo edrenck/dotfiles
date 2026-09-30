@@ -1,109 +1,141 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# A readable context line, followed by an uncluttered command line.
+# Two-line Rosé Pine prompt: framed context, an open command line.
+palette = "rose_pine"
 add_newline = false
-format = "$username$hostname$directory$git_branch$git_status$git_state$nodejs$bun$python$rust$golang$java$kotlin$lua$swift$cmd_duration$jobs$line_break$character"
+format = "[╭─](fg:frame) $username$hostname$directory$git_branch$git_status$git_state$nodejs$bun$python$rust$golang$java$kotlin$lua$swift$fill$cmd_duration$time$line_break[╰─](fg:frame) $status$jobs$character"
 right_format = ""
-continuation_prompt = "[∙](dimmed blue) "
+continuation_prompt = "[│](fg:frame) [∙](fg:foam) "
+
+# Match the installed Ghostty Rosé Pine theme; no patched-font glyphs required.
+[palettes.rose_pine]
+surface = "#26233a"
+frame = "#6e6a86"
+rail = "#403d52"
+text = "#e0def4"
+iris = "#c4a7e7"
+foam = "#9ccfd8"
+rose = "#ebbcba"
+gold = "#f6c177"
+love = "#eb6f92"
 
 [directory]
-style = "bold blue"
+style = "bold fg:iris bg:surface"
 truncation_length = 3
 truncate_to_repo = false
 truncation_symbol = "…/"
 read_only = " ⊘"
-format = "[$path]($style)[$read_only]($read_only_style) "
+read_only_style = "fg:gold bg:surface"
+format = "[ ◈ $path]($style)[$read_only]($read_only_style)[ ]($style) "
 
 [git_branch]
 symbol = "⎇ "
-style = "cyan"
-format = "[$symbol$branch]($style) "
+style = "fg:foam bg:surface"
+format = "[ $symbol$branch ]($style) "
 truncation_length = 24
 truncation_symbol = "…"
 
 [git_status]
-style = "yellow"
-format = '([\[$all_status$ahead_behind\]]($style) )'
-conflicted = '×${count}'
-ahead = '↑${count}'
-behind = '↓${count}'
-diverged = '↑${ahead_count}↓${behind_count}'
-untracked = '?${count}'
-stashed = '≡${count}'
-modified = '~${count}'
-staged = '+${count}'
-renamed = '»${count}'
-deleted = '−${count}'
+style = "fg:gold bg:surface"
+format = '([ $all_status$ahead_behind]($style) )'
+conflicted = '×${count} '
+ahead = '↑${count} '
+behind = '↓${count} '
+diverged = '↑${ahead_count} ↓${behind_count} '
+untracked = '?${count} '
+stashed = '≡${count} '
+modified = '~${count} '
+staged = '+${count} '
+renamed = '»${count} '
+deleted = '−${count} '
 
 [git_state]
-style = "bold red"
+style = "bold fg:love"
+
+[fill]
+symbol = "─"
+style = "fg:rail"
+
+[time]
+disabled = false
+format = "[ ◷ $time](fg:frame)"
+time_format = "%H:%M"
+utc_time_offset = "local"
 
 [character]
-success_symbol = "[❯](bold green)"
-error_symbol = "[❯](bold red)"
-vimcmd_symbol = "[❮](bold yellow)"
+success_symbol = "[❯](bold fg:foam)"
+error_symbol = "[❯](bold fg:love)"
+vimcmd_symbol = "[❮](bold fg:gold)"
+
+[status]
+disabled = false
+symbol = "× "
+style = "fg:love"
+format = "[$symbol$status]($style) "
 
 [cmd_duration]
 min_time = 3000
-format = "[$duration](dimmed yellow) "
+format = "[ ◴ $duration](fg:gold)"
 
 [jobs]
 symbol = "↻ "
-style = "dimmed cyan"
+style = "fg:foam"
+number_threshold = 1
+symbol_threshold = 1
 format = "[$symbol$number]($style) "
 
 [username]
 show_always = false
-style_user = "dimmed cyan"
-style_root = "bold red"
+style_user = "fg:foam"
+style_root = "bold fg:love"
 format = "[$user]($style) "
 
 [hostname]
 ssh_only = true
-style = "dimmed cyan"
+style = "fg:foam"
 format = "[@$hostname]($style) "
 
 [nodejs]
 symbol = "node "
-style = "dimmed green"
-format = "[$symbol$version]($style) "
+style = "fg:rose bg:surface"
+format = "[ $symbol$version ]($style) "
 
 [bun]
 symbol = "bun "
-style = "dimmed green"
-format = "[$symbol$version]($style) "
+style = "fg:rose bg:surface"
+format = "[ $symbol$version ]($style) "
 
 [python]
 symbol = "py "
-style = "dimmed green"
-format = "[${symbol}${version}( $virtualenv)]($style) "
+style = "fg:rose bg:surface"
+format = "[ ${symbol}${version}( $virtualenv) ]($style) "
 
 [rust]
 symbol = "rs "
-style = "dimmed green"
-format = "[$symbol$version]($style) "
+style = "fg:rose bg:surface"
+format = "[ $symbol$version ]($style) "
 
 [golang]
 symbol = "go "
-style = "dimmed green"
-format = "[$symbol$version]($style) "
+style = "fg:rose bg:surface"
+format = "[ $symbol$version ]($style) "
 
 [java]
 symbol = "java "
-style = "dimmed green"
-format = "[$symbol$version]($style) "
+style = "fg:rose bg:surface"
+format = "[ $symbol$version ]($style) "
 
 [kotlin]
 symbol = "kt "
-style = "dimmed green"
-format = "[$symbol$version]($style) "
+style = "fg:rose bg:surface"
+format = "[ $symbol$version ]($style) "
 
 [lua]
 symbol = "lua "
-style = "dimmed green"
-format = "[$symbol$version]($style) "
+style = "fg:rose bg:surface"
+format = "[ $symbol$version ]($style) "
 
 [swift]
 symbol = "swift "
-style = "dimmed green"
-format = "[$symbol$version]($style) "
+style = "fg:rose bg:surface"
+format = "[ $symbol$version ]($style) "
