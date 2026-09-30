@@ -3,7 +3,8 @@
 `~/.zshrc` sources `~/.config/zsh/zshrc`, which explicitly loads `.zshenv`
 from this directory. Leave `ZDOTDIR` unset for this layout.
 
-The root README lists the Homebrew dependencies. Antidote manages:
+Run `yadm bootstrap` to install dependencies on macOS (Homebrew) or Linux (apt).
+Antidote loads from Homebrew on macOS or `~/.local/share/antidote` on Linux and manages:
 
 - `zsh-completions`: extra command-specific completion definitions.
 - `zsh-vi-mode`: the existing Vim-style editing modes, initialized at load time.

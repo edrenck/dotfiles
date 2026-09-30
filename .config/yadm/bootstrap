@@ -1,0 +1,277 @@
+#!/usr/bin/env bash
+# yadm runs this after cloning, or with `yadm bootstrap`.
+set -euo pipefail
+
+dry_run=0
+desktop=1
+docker=0
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run) dry_run=1 ;;
+    --cli) desktop=0 ;;
+    --docker) docker=1 ;;
+    --help)
+      echo 'Usage: bootstrap [--dry-run] [--cli] [--docker]'
+      echo 'Install missing dotfile dependencies. --cli skips desktop apps.'
+      echo '--docker also installs Docker Desktop (macOS) or docker.io (Linux).'
+      exit 0 ;;
+    *) echo "Unknown option: $arg" >&2; exit 2 ;;
+  esac
+done
+
+system=$(uname -s)
+case "$system" in
+  Darwin|Linux) ;;
+  *) echo "Unsupported system: $system" >&2; exit 1 ;;
+esac
+if [[ "$system" == Linux ]] && ! command -v apt-get >/dev/null 2>&1; then
+  echo 'Linux bootstrap requires an apt-based distribution.' >&2
+  exit 1
+fi
+if [[ "$system" == Darwin && $EUID == 0 ]]; then
+  echo 'Run the macOS bootstrap as your regular user, not root.' >&2
+  exit 1
+fi
+
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+data_home=${XDG_DATA_HOME:-$HOME/.local/share}
+cache_home=${XDG_CACHE_HOME:-$HOME/.cache}
+export PATH="$HOME/.local/bin:$PATH"
+temporary=''
+trap '[[ -z "$temporary" ]] || rm -rf -- "$temporary"' EXIT
+
+has() { command -v "$1" >/dev/null 2>&1; }
+run() {
+  if (( dry_run )); then
+    printf '  would run:'; printf ' %q' "$@"; printf '\n'
+  else
+    "$@"
+  fi
+}
+as_root() {
+  if (( EUID == 0 )); then run "$@"; else run sudo "$@"; fi
+}
+version_ge() {
+  awk -v got="$1" -v need="$2" 'BEGIN {
+    split(got,g,"."); split(need,n,".");
+    for(i=1;i<=3;i++) { if(g[i]+0>n[i]+0) exit 0; if(g[i]+0<n[i]+0) exit 1 }
+    exit 0
+  }'
+}
+tool_ready() {
+  has "$1" || return 1
+  [[ -n "${2:-}" ]] || return 0
+  local version
+  version=$("$1" --version 2>/dev/null | sed -nE '1s/^[^0-9]*([0-9]+\.[0-9]+\.[0-9]+).*/\1/p')
+  [[ -n "$version" ]] || return 1
+  version_ge "$version" "$2"
+}
+release_install() {
+  if (( dry_run )); then
+    echo "  would install $1 from a SHA-256 verified GitHub release into ~/.local"
+  else
+    python3 "$script_dir/install-release.py" "$1"
+  fi
+}
+apt_candidate() {
+  local candidate
+  candidate=$(apt-cache policy "$1" | awk '/Candidate:/ {print $2; exit}')
+  [[ -n "$candidate" && "$candidate" != '(none)' ]] || return 1
+  if [[ -n "${2:-}" ]]; then
+    dpkg --compare-versions "$candidate" ge "$2" || return 1
+  fi
+}
+apt_tool() {
+  local command=$1 package=$2 minimum=${3:-} alternate=${4:-}
+  if tool_ready "$command" "$minimum" || { [[ -n "$alternate" ]] && has "$alternate"; }; then
+    echo "  present: $command"
+  elif apt_candidate "$package" "$minimum"; then
+    as_root apt-get install -y "$package"
+  else
+    release_install "$command"
+  fi
+}
+brew_tool() {
+  local command=$1 formula=$2 minimum=${3:-}
+  if tool_ready "$command" "$minimum"; then
+    echo "  present: $command"
+  elif [[ -n "$minimum" ]] && brew list --formula "$formula" >/dev/null 2>&1; then
+    run brew upgrade "$formula"
+  else
+    run brew install "$formula"
+  fi
+}
+link_command() {
+  local name=$1 alternate=$2 destination="$HOME/.local/bin/$1"
+  if ! has "$name" && has "$alternate"; then
+    if [[ -e "$destination" || -L "$destination" ]]; then
+      echo "Refusing to replace existing $destination" >&2; return 1
+    fi
+    run ln -s "$(command -v "$alternate")" "$destination"
+  fi
+}
+
+echo "Dotfiles bootstrap: $system (desktop=$desktop, dry-run=$dry_run)"
+run mkdir -p "$HOME/.local/bin" "$data_home" "$cache_home/zsh"
+
+if [[ "$system" == Darwin ]]; then
+  # Homebrew can exist without being on a fresh shell's PATH.
+  if ! has brew; then
+    for prefix in /opt/homebrew /usr/local; do
+      if [[ -x "$prefix/bin/brew" ]]; then
+        eval "$("$prefix/bin/brew" shellenv)"
+        break
+      fi
+    done
+  fi
+  if ! has brew; then
+    if (( dry_run )); then
+      echo '  would install Homebrew using its official installer'
+    else
+      temporary=$(mktemp -d)
+      curl --fail --location --proto '=https' --tlsv1.2 \
+        https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o "$temporary/homebrew.sh"
+      /bin/bash "$temporary/homebrew.sh"
+      if [[ -x /opt/homebrew/bin/brew ]]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+      else
+        eval "$(/usr/local/bin/brew shellenv)"
+      fi
+    fi
+  fi
+  # Native build tools are used by Neovim's parsers and editor extensions.
+  if ! xcode-select -p >/dev/null 2>&1; then
+    if (( dry_run )); then
+      echo '  would request Xcode Command Line Tools'
+    else
+      xcode-select --install
+      echo 'Finish installing Command Line Tools, then rerun this bootstrap.' >&2
+      exit 1
+    fi
+  fi
+  while read -r command formula minimum; do
+    brew_tool "$command" "$formula" "$minimum"
+  done <<'PACKAGES'
+git git
+curl curl
+zsh zsh
+yadm yadm
+nvim neovim 0.11.2
+eza eza
+bat bat
+fd fd
+fzf fzf
+zoxide zoxide
+starship starship
+rg ripgrep
+thefuck thefuck
+lazygit lazygit
+lazydocker lazydocker
+btop btop
+lf lf
+gitleaks gitleaks 8.19.0
+node node
+npm node
+python3 python
+tree-sitter tree-sitter-cli 0.25.0
+PACKAGES
+  if ! has brew || [[ ! -r "$(brew --prefix)/opt/antidote/share/antidote/antidote.zsh" ]]; then
+    run brew install antidote
+  fi
+  if (( desktop )); then
+    if [[ ! -d /Applications/Ghostty.app && ! -d "$HOME/Applications/Ghostty.app" ]]; then
+      run brew install --cask ghostty
+    fi
+    if ! has aerospace && [[ ! -d /Applications/AeroSpace.app && ! -d "$HOME/Applications/AeroSpace.app" ]]; then
+      run brew install --cask nikitabobko/tap/aerospace
+    fi
+    brew_tool borders FelixKratz/formulae/borders
+    if ! has brew || ! brew list --cask font-space-mono-nerd-font >/dev/null 2>&1; then
+      run brew install --cask font-space-mono-nerd-font
+    fi
+  fi
+  if (( docker )) && [[ ! -d /Applications/Docker.app && ! -d "$HOME/Applications/Docker.app" ]]; then
+    run brew install --cask docker
+  fi
+else
+  as_root apt-get update
+  # Build tools, Node and Python support LazyVim/Mason; plugins install on first launch.
+  for package in ca-certificates git curl zsh yadm build-essential unzip zip \
+    python3 python3-venv python3-pip nodejs npm; do
+    if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q '^install ok installed$'; then
+      as_root apt-get install -y "$package"
+    fi
+  done
+  while read -r command package minimum alternate; do
+    # A dash means that no minimum version is needed.
+    [[ "$minimum" != '-' ]] || minimum=''
+    apt_tool "$command" "$package" "$minimum" "$alternate"
+  done <<'PACKAGES'
+nvim neovim 0.11.2
+eza eza -
+bat bat - batcat
+fd fd-find - fdfind
+fzf fzf -
+zoxide zoxide -
+starship starship -
+rg ripgrep -
+thefuck thefuck -
+lazygit lazygit -
+lazydocker lazydocker -
+btop btop -
+lf lf -
+gitleaks gitleaks 8.19.0
+tree-sitter tree-sitter-cli 0.25.0
+PACKAGES
+  link_command bat batcat
+  link_command fd fdfind
+  if [[ ! -r "$data_home/antidote/antidote.zsh" ]]; then
+    if [[ -e "$data_home/antidote" ]]; then
+      echo "Incomplete Antidote directory: $data_home/antidote; move it aside and rerun." >&2
+      exit 1
+    fi
+    run git clone --depth=1 https://github.com/mattmc3/antidote.git "$data_home/antidote"
+  fi
+  if (( desktop )); then
+    if ! has ghostty; then
+      if apt_candidate ghostty; then
+        as_root apt-get install -y ghostty
+      else
+        release_install ghostty
+      fi
+    fi
+  fi
+  if (( docker )); then
+    if ! has docker; then as_root apt-get install -y docker.io; fi
+    if ! docker compose version >/dev/null 2>&1; then
+      if apt_candidate docker-compose-v2; then
+        as_root apt-get install -y docker-compose-v2
+      elif apt_candidate docker-compose; then
+        as_root apt-get install -y docker-compose
+      else
+        echo 'Docker Compose is unavailable in the configured apt repositories.' >&2
+        exit 1
+      fi
+    fi
+  fi
+fi
+
+# Load and cache the declared shell plugins now; do not source personal shell overrides.
+antidote_path="$data_home/antidote/antidote.zsh"
+if [[ "$system" == Darwin ]] && has brew; then
+  antidote_path="$(brew --prefix)/opt/antidote/share/antidote/antidote.zsh"
+fi
+run zsh -f -c 'source "$1"; antidote bundle < "$HOME/.zsh_plugins.txt" >/dev/null' bootstrap "$antidote_path"
+run yadm config core.hooksPath .config/yadm/git-hooks
+if (( dry_run )); then
+  echo 'Dry run complete; no packages or files were changed.'
+else
+  hash -r
+  for tool in zsh nvim eza bat fd fzf zoxide starship rg thefuck lazygit lazydocker btop lf gitleaks tree-sitter; do
+    has "$tool" || { echo "Missing after bootstrap: $tool" >&2; exit 1; }
+  done
+  tool_ready nvim 0.11.2 || { echo 'Neovim is still too old for LazyVim.' >&2; exit 1; }
+  echo 'Bootstrap complete. Open a new Zsh shell; launch Neovim to install editor plugins.'
+  if [[ "${SHELL:-}" != */zsh ]]; then echo 'To make Zsh your login shell: chsh -s "$(command -v zsh)"'; fi
+  if ! has docker; then echo 'Lazydocker needs a Docker host; rerun with --docker to install one.'; fi
+fi

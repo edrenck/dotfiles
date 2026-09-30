@@ -59,14 +59,16 @@ dotfiles_history_init() {
   typeset -g _DOTFILES_HISTORY_READY=1
 }
 
-if [[ -n "$_DOTFILES_BREW_PREFIX" ]]; then
+# Homebrew on macOS; bootstrap's Git installation on Linux.
+antidote_file="$XDG_DATA_HOME/antidote/antidote.zsh"
+if [[ -n "$_DOTFILES_BREW_PREFIX" && -r "$_DOTFILES_BREW_PREFIX/opt/antidote/share/antidote/antidote.zsh" ]]; then
   antidote_file="$_DOTFILES_BREW_PREFIX/opt/antidote/share/antidote/antidote.zsh"
-  if [[ -r "$antidote_file" ]]; then
-    source "$antidote_file"
-    antidote load "$HOME/.zsh_plugins.txt" "$XDG_CACHE_HOME/zsh/antidote-plugins.zsh"
-  fi
-  unset antidote_file
 fi
+if [[ -r "$antidote_file" ]]; then
+  source "$antidote_file"
+  antidote load "$HOME/.zsh_plugins.txt" "$XDG_CACHE_HOME/zsh/antidote-plugins.zsh"
+fi
+unset antidote_file
 # Keep a functional shell when the plugin manager is unavailable.
 dotfiles_compinit
 dotfiles_history_init
