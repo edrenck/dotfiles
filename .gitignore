@@ -8,15 +8,10 @@
 !/.config/
 /.config/*
 !/.config/borders/
-!/.config/btop/
 !/.config/ghostty/
-!/.config/lazydocker/
-!/.config/lazygit/
 !/.config/nvim/
-!/.config/opencode/
 !/.config/starship.toml
 !/.config/yadm/
-!/.config/zed/
 !/.config/zsh/
 
 # Credential stores, generated state, and local overrides stay on each machine.
